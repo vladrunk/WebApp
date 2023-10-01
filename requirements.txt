@@ -1,8 +1,11 @@
 fastapi==0.103.2
 uvicorn==0.20.0
 SQLAlchemy==1.4.45
-pydantic[email]
+pydantic[email]==2.4.2
 envparse==0.2.0
 psycopg2==2.9.5
 asyncpg==0.27.0
 alembic==1.9.0
+pytest==7.4.2
+pytest-asyncio==0.20.3
+httpx==0.25.0

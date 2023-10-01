@@ -140,5 +140,9 @@ dmypy.json
 .pytype/
 cython_debug/
 /.idea/
-/migrations/
-/alembic.ini
+/tests/migrations/versions/
+/tests/migrations/script.py.mako
+/tests/migrations/README
+/migrations/versions/
+/migrations/script.py.mako
+/migrations/README
