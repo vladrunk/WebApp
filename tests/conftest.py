@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
+# Импорт настроек и FastAPI-приложения из соответствующих модулей
 import settings
 from main import app
 
@@ -13,14 +14,17 @@ import asyncio
 from db.session import get_db
 import asyncpg
 
+# Создание асинхронного движка SQLAlchemy для тестов с использованием настроек из settings.py
 test_engine = create_async_engine(settings.TEST_DATABASE_URL, future=True, echo=True)
 test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
 
+# Таблицы, которые будут очищены перед выполнением тестов
 CLEAN_TABLES = [
     "users",
 ]
 
 
+# Фикстура для настройки асинхронного цикла событий в pytest
 @pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -28,6 +32,7 @@ def event_loop():
     loop.close()
 
 
+# Фикстура для выполнения миграций перед запуском тестов
 @pytest.fixture(scope="session", autouse=True)
 async def run_migrations():
     os.system("alembic init migrations")
@@ -35,6 +40,7 @@ async def run_migrations():
     os.system("alembic upgrade heads")
 
 
+# Фикстура для асинхронной сессии тестовой базы данных
 @pytest.fixture(scope="session")
 async def async_session_test():
     engine = create_async_engine(settings.TEST_DATABASE_URL, future=True, echo=True)
@@ -42,6 +48,7 @@ async def async_session_test():
     yield async_session
 
 
+# Фикстура для очистки таблиц перед выполнением каждого тестового случая
 @pytest.fixture(scope="function", autouse=True)
 async def clean_tables(async_session_test):
     """Clean data in all tables before running test function"""
@@ -51,6 +58,7 @@ async def clean_tables(async_session_test):
                 await session.execute(f"""TRUNCATE TABLE {table_for_cleaning}""")
 
 
+# Фикстура для создания тестового клиента FastAPI
 @pytest.fixture(scope="function")
 async def client() -> Generator[TestClient, Any, None]:
     """
@@ -69,6 +77,7 @@ async def client() -> Generator[TestClient, Any, None]:
         yield client
 
 
+# Фикстура для создания пула соединений к тестовой базе данных с использованием asyncpg
 @pytest.fixture(scope="session")
 async def asyncpg_pool():
     pool = await asyncpg.create_pool("".join(settings.TEST_DATABASE_URL.split("+asyncpg")))
@@ -76,6 +85,7 @@ async def asyncpg_pool():
     pool.close()
 
 
+# Фикстура для получения пользователя из тестовой базы данных по UUID
 @pytest.fixture
 async def get_user_from_database(asyncpg_pool):
 

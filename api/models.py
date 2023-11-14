@@ -4,9 +4,11 @@ from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, field_validator
 
 
+# Регулярное выражение для проверки наличия только букв в строке
 LETTER_MATCH_PATTERN = re.compile(r"^[а-яА-Яa-zA-Z\-]+$")
 
 
+# Базовый класс модели, настроенный для конвертации даже не словарных объектов в JSON
 class TunnedModel(BaseModel):
     class Config:
         """Tells pydantic to convert even non dict obj to json"""
@@ -14,6 +16,7 @@ class TunnedModel(BaseModel):
         from_attributes = True
 
 
+# Модель для отображения пользователя
 class ShowUser(TunnedModel):
     user_id: uuid.UUID
     f_name: str
@@ -22,11 +25,13 @@ class ShowUser(TunnedModel):
     is_active: bool
 
 
+# Модель для создания нового пользователя
 class UserCreate(BaseModel):
     f_name: str
     l_name: str
     email: EmailStr
 
+    # Валидатор для поля f_name, проверяющий, содержит ли строка только буквы
     @field_validator("f_name")
     def validate_f_name(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
@@ -35,6 +40,7 @@ class UserCreate(BaseModel):
             )
         return value
 
+    # Валидатор для поля l_name, проверяющий, содержит ли строка только буквы
     @field_validator("l_name")
     def validate_l_name(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
