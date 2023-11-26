@@ -88,9 +88,19 @@ async def asyncpg_pool():
 # Фикстура для получения пользователя из тестовой базы данных по UUID
 @pytest.fixture
 async def get_user_from_database(asyncpg_pool):
-
     async def get_user_from_database_by_uuid(user_id: str):
         async with asyncpg_pool.acquire() as connection:
             return await connection.fetch("""SELECT * FROM users WHERE user_id = $1""", user_id)
 
     return get_user_from_database_by_uuid
+
+
+# Фикстура для создания пользователя в тестовой базе данных по UUID
+@pytest.fixture
+async def create_user_in_database(asyncpg_pool):
+    async def create_user_in_database(user_id: str, f_name: str, l_name: str, email: str, is_active: bool):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute("""INSERT INTO users VALUES ($1, $2, $3, $4, $5)""",
+                                            user_id, f_name, l_name, email, is_active)
+
+    return create_user_in_database
